@@ -28,8 +28,7 @@ def signup():
   '''
   Permite la conexión a la base de datos.
   :return:
-  '''
-  return render_template('signup.html')
+  '''  return render_template('signup.html')
 
 @application.route("/dashboard")
 def dashboard():
