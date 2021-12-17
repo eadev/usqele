@@ -13,7 +13,6 @@ def home():
   '''
   return render_template('index.html')
 
-
 # ENDPOINT DE LA APLICACIÓN
 @application.route("/login")
 def login():
@@ -22,7 +21,6 @@ def login():
   :return:
   '''
   return render_template('login.html')
-
 
 # ENDPOINT DE LA APLICACIÓN
 @application.route("/signup")
