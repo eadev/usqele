@@ -37,7 +37,8 @@ def dashboard():
   Permite la conexión a la base de datos.
   :return:
   '''
-  return render_template('dashboard.html')
+  suma = "Oscar Munoz"
+  return render_template('dashboard.html', total=suma)
 
 
 # SE EJECUTA CUANDO SE LLAMA ESTE ARCHIVO COMO PRINCIPAL
