@@ -37,8 +37,21 @@ def dashboard():
   Permite la conexión a la base de datos.
   :return:
   '''
-  return render_template('dashboard.html')
+  basededatos = "NOMBRE BASE DE DATOS"
+  tables = tablas_obtener()
+  return render_template('dashboard.html', tablas=tables, basededatos=basededatos)
 
+def tablas_obtener():
+  '''
+  Retornar el listado de tablas disponibles.
+  :return:
+  '''
+  tablas = ["usuarios", "roles", "permisos"]
+  return tablas
+
+
+def sumar(a, b):
+  return a + b
 
 # SE EJECUTA CUANDO SE LLAMA ESTE ARCHIVO COMO PRINCIPAL
 if __name__ == '__main__':
