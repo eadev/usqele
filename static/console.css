@@ -1,6 +1,6 @@
 .console{
   min-height: 300px;
-  height: 300px;
+  height: 200px;
   max-height: 500px;
   overflow-y: auto;
 }

@@ -20,7 +20,7 @@
       <div class="row">
         <div class="col-md-4">
           <div class="list-group">
-            <a href="#" class="list-group-item list-group-item-action active">Tablas {{ basededatos }}</a>
+            <a href="#" class="list-group-item list-group-item-action active">Tablas en <b>{{ basededatos }}</b></a>
             {%  for tabla in tablas %}
               <a href="#" class="list-group-item list-group-item-action">{{ tabla }}</a>
             {% endfor %}
@@ -32,6 +32,10 @@
               <ul class="nav nav-pills">
                 <li class="nav-item border-bottom border-danger"><a href="#" class="nav-link text-dark">Console&nbsp;</a> </li>
               </ul>
+              <div class="border p-2 mt-3 console" contenteditable="true" >
+                <b>SELECT</b> * FROM usuarios;
+              </div>
+              <h3>Resultado</h3>
               <div class="border p-2 mt-3 console" contenteditable="true" >
                 <b>SELECT</b> * FROM usuarios;
               </div>
