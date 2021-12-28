@@ -48,12 +48,8 @@ def conectar():
 
   return flask.redirect("/dashboard")
 
-@application.route("/dashboard")
+@application.route("/dashboard", methods=['GET'])
 def dashboard():
-  '''
-  Permite la conexión a la base de datos.
-  :return:
-  '''
   HOST = session['host']
   USER = session['user']
   PASSWORD = session['password']
@@ -76,8 +72,36 @@ def dashboard():
   return render_template('dashboard.html', tablas=ltablas, basededatos=DB)
 
 
-def sumar(a, b):
-  return a + b
+@application.route("/consulta", methods=['POST'])
+def consulta():
+  '''
+  Permite la conexión a la base de datos.
+  :return:
+  '''
+  HOST = session['host']
+  USER = session['user']
+  PASSWORD = session['password']
+  DB = session['db']
+  # CONECTARSE A LA BASE DE DATOS
+  connection = pymysql.connect(host=HOST,
+                               user=USER,
+                               password=PASSWORD,
+                               database=DB,
+                               cursorclass=pymysql.cursors.DictCursor)
+
+  with connection:  # SI SE CONECTO EJECUTA EL CÓDIGO SIGUIENTE
+    with connection.cursor() as cursor:  # SI PUEDE GENERAR EL CURSOS EJECUTA LO SIGUIENTE
+      sql = request.form.get("sql")
+      cursor.execute(sql)
+      data = cursor.fetchall()
+      respuesta = "<TABLE class='border'>"
+      for fila in data:
+        respuesta = respuesta + "<TR>"
+        for celda in fila:
+          respuesta = respuesta + f"<TD>{fila[celda]}</TD>"
+        respuesta = respuesta + "</TR>"
+      respuesta = respuesta + "</TABLE>"
+  return respuesta
 
 # SE EJECUTA CUANDO SE LLAMA ESTE ARCHIVO COMO PRINCIPAL
 if __name__ == '__main__':
