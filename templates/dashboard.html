@@ -12,8 +12,9 @@
 
 <body>
   <nav class="navbar navbar-light bg-dark fixed-top">
-    <div class="container-fluid"> <a class="navbar-brand text-primary" href="#">
-        <b class="text-white"> Usqele</b> <span>a simple database manager</span>
+    <div class="container-fluid p-0">
+      <a class="navbar-brand text-primary" href="#">
+        <b class="text-white"> Usqele</b> <span class="font-italic">a simple database manager</span>
       </a>
       <div>
       <a class="bt btn-white" href="/salir">Salir</a>
@@ -25,52 +26,73 @@
     <div class="container-fluid">
       <div class="row">
         <div class="col-md-3">
-          <div class="list-group mt-2">
-            <h4>Conectado a <b>{{ basededatos }}</b></h4>
-            <a href="#" class="list-group-item list-group-item-action active">Tablas</a>
-            {%  for tabla in tablas %}
-              <a href="#" class="list-group-item list-group-item-action">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-table" viewBox="0 0 16 16">
-                  <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm15 2h-4v3h4V4zm0 4h-4v3h4V8zm0 4h-4v3h3a1 1 0 0 0 1-1v-2zm-5 3v-3H6v3h4zm-5 0v-3H1v2a1 1 0 0 0 1 1h3zm-4-4h4V8H1v3zm0-4h4V4H1v3zm5-3v3h4V4H6zm4 4H6v3h4V8z"/>
-                 </svg> {{ tabla }}
-              </a>
-            {% endfor %}
+          <h4>Conectado a <b>{{ basededatos }}</b></h4>
+          <div class="list-group mt-1">
+            <a href="#" class="list-group-item list-group-item-action bg-success text-white mt-1 rounded text-sm-center">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-arrow-down-fill" viewBox="0 0 16 16">
+                <path d="M12 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM8 5a.5.5 0 0 1 .5.5v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 1 1 .708-.708L7.5 9.293V5.5A.5.5 0 0 1 8 5z"/>
+              </svg>
+              <small>Exportar Documentación</small></a>
+          </div>
+          <div class="mt-2 pre-scrollable border-bottom border-top pb-2">
+            <div class="list-group mt-2">
+              <li href="#" class="list-group-item list-group-item-action active  font-weight-bold rounded-top">Tablas</li>
+              {%  for tabla in tablas %}
+                <a href="#" class="list-group-item list-group-item-action" onclick="odashboard.seleccionar('{{ tabla }}');">
+                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-table" viewBox="0 0 16 16">
+                    <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm15 2h-4v3h4V4zm0 4h-4v3h4V8zm0 4h-4v3h3a1 1 0 0 0 1-1v-2zm-5 3v-3H6v3h4zm-5 0v-3H1v2a1 1 0 0 0 1 1h3zm-4-4h4V8H1v3zm0-4h4V4H1v3zm5-3v3h4V4H6zm4 4H6v3h4V8z"/>
+                   </svg> <small>{{ tabla }}</small>
+                </a>
+              {% endfor %}
 
-            <a href="#" class="list-group-item list-group-item-action active">Vistas</a>
-            {%  for vista in vistas %}
-              <a href="#" class="list-group-item list-group-item-action">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-table" viewBox="0 0 16 16">
-                  <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm15 2h-4v3h4V4zm0 4h-4v3h4V8zm0 4h-4v3h3a1 1 0 0 0 1-1v-2zm-5 3v-3H6v3h4zm-5 0v-3H1v2a1 1 0 0 0 1 1h3zm-4-4h4V8H1v3zm0-4h4V4H1v3zm5-3v3h4V4H6zm4 4H6v3h4V8z"/>
-                 </svg> {{ vista }}
-              </a>
-            {% endfor %}
+              <li href="#" class="list-group-item list-group-item-action active font-weight-bold">Vistas</li>
+              {%  for vista in vistas %}
+                <a href="#" class="list-group-item list-group-item-action" onclick="odashboard.seleccionar('{{ vista }}');">
+                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-table" viewBox="0 0 16 16">
+                    <path d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm15 2h-4v3h4V4zm0 4h-4v3h4V8zm0 4h-4v3h3a1 1 0 0 0 1-1v-2zm-5 3v-3H6v3h4zm-5 0v-3H1v2a1 1 0 0 0 1 1h3zm-4-4h4V8H1v3zm0-4h4V4H1v3zm5-3v3h4V4H6zm4 4H6v3h4V8z"/>
+                   </svg> <small>{{ vista }}</small>
+                </a>
+              {% endfor %}
+            </div>
           </div>
         </div>
-        <div class="col-md-9">
+        <div class="col-md-6">
           <div class="row">
             <div class="col-md-12">
               <ul class="nav nav-pills">
                 <li class="nav-item border-bottom border-danger"><a href="#" class="nav-link text-dark">Console&nbsp;</a> </li>
               </ul>
-              <textarea class="form-control" id="console"  rows="3">SELECT * from usuarios;</textarea>
+              <textarea class="form-control" id="console"  rows="3"></textarea>
               <div class="border-bottom pb-2">
-                <button onclick="odashboard.ejecutar()"  class="btn btn-success mt-3">Ejecutar</button>
+                <button onclick="odashboard.guardar()"  class="btn btn-outline-dark mt-3 mr-1">Guardar</button>
+                <button onclick="odashboard.ejecutar()"  class="btn btn-dark mt-3">
+                  <div class="spinner-grow spinner-grow-sm text-white" style="display: none;" role="status" id="loading">
+                    <span class="sr-only">Loading...</span>
+                  </div>
+                  Ejecutar
+                </button>
               </div>
 
               <h3>Resultado</h3>
-              <div class="console border p-2 mt-3 bg-warning" id="respuesta" style="height: 300px;">
+              <div class="console border p-2 mt-3 bg-white pre-scrollable" id="respuesta" style="height: 300px;">
 
               </div>
 
             </div>
           </div>
         </div>
+        <div class="col-md-3 border-left">
+          <h4>Favoritos</h4>
+          <ul class="list-group" id="marcadores">
+
+          </ul>
+        </div>
       </div>
     </div>
   </div>
-  <div class="py-3 fixed-bottom bg-white">
+  <div class="py-3 fixed-bottom bg-white border-top">
     <div class="container">
-      <div class="row">
+      <div class="row" >
         <div class="col-md-12 text-center">
           <p class="mb-0" >© 2021&nbsp; Usqele - Reservados todos los derechos.</p>
         </div>

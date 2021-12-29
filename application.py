@@ -4,6 +4,7 @@ from flask import Flask, render_template, request, session
 import pymysql.cursors
 import re
 import logging
+import traceback
 logging.basicConfig(filename='usqele.log', filemode='w', level=logging.DEBUG)
 
 # GENERACIÓN DE LA APLICACIÓN FLASK
@@ -54,35 +55,45 @@ def conectar():
 
 @application.route("/dashboard", methods=['GET'])
 def dashboard():
-  HOST = session['host']
-  USER = session['user']
-  PASSWORD = session['password']
-  DB = session['db']
-  # CONECTARSE A LA BASE DE DATOS
-  connection = pymysql.connect(host=HOST,
-                               user=USER,
-                               password=PASSWORD,
-                               database=DB,
-                               cursorclass=pymysql.cursors.DictCursor)
+  if 'host' in session:
+      HOST = session['host']
+      USER = session['user']
+      PASSWORD = session['password']
+      DB = session['db']
+      # CONECTARSE A LA BASE DE DATOS
+      connection = pymysql.connect(host=HOST,
+                                   user=USER,
+                                   password=PASSWORD,
+                                   database=DB,
+                                   cursorclass=pymysql.cursors.DictCursor)
 
-  with connection:  # SI SE CONECTO EJECUTA EL CÓDIGO SIGUIENTE
-    with connection.cursor() as cursor:  # SI PUEDE GENERAR EL CURSOS EJECUTA LO SIGUIENTE
-      #OBTENER LAS TABLAS DE LA BASE DE DATOS
-      sql = f"SHOW FULL TABLES IN {DB} WHERE TABLE_TYPE LIKE 'BASE TABLE';"
-      cursor.execute(sql)
-      tablas = cursor.fetchall()
-      ltablas = []
-      for tabla in tablas:
-        ltablas.append(f"{tabla['Tables_in_usqele']}")
-      # OBTENER AS VISTAS DE LA BASE DE DATOS
-      sql = f"SHOW FULL TABLES IN {DB} WHERE TABLE_TYPE LIKE 'VIEW';"
-      cursor.execute(sql)
-      vistas = cursor.fetchall()
-      print(vistas)
-      lvistas = []
-      for vista in vistas:
-        lvistas.append(f"{vista['Tables_in_usqele']}")
-  return render_template('dashboard.html', tablas=ltablas, vistas=lvistas, basededatos=DB)
+      with connection:  # SI SE CONECTO EJECUTA EL CÓDIGO SIGUIENTE
+        with connection.cursor() as cursor:  # SI PUEDE GENERAR EL CURSOS EJECUTA LO SIGUIENTE
+          #OBTENER LAS TABLAS DE LA BASE DE DATOS
+          sql = f"SHOW FULL TABLES IN {DB} WHERE TABLE_TYPE LIKE 'BASE TABLE';"
+          cursor.execute(sql)
+          tablas = cursor.fetchall()
+          ltablas = []
+          for tabla in tablas:
+            i = 0
+            for columna in tabla:
+              if i == 0:
+                ltablas.append(f"{tabla[columna]}")
+              i += 1
+          # OBTENER AS VISTAS DE LA BASE DE DATOS
+          sql = f"SHOW FULL TABLES IN {DB} WHERE TABLE_TYPE LIKE 'VIEW';"
+          cursor.execute(sql)
+          vistas = cursor.fetchall()
+          lvistas = []
+          for vista in vistas:
+            i = 0
+            for columna in vista:
+              if i == 0:
+                lvistas.append(f"{vista[columna]}")
+              i += 1
+      return render_template('dashboard.html', tablas=ltablas, vistas=lvistas, basededatos=DB)
+  else:
+    return flask.redirect("/login")
 
 
 @application.route("/consulta", methods=['POST'])
@@ -91,29 +102,58 @@ def consulta():
   Permite la conexión a la base de datos.
   :return:
   '''
-  HOST = session['host']
-  USER = session['user']
-  PASSWORD = session['password']
-  DB = session['db']
-  # CONECTARSE A LA BASE DE DATOS.
-  connection = pymysql.connect(host=HOST,
-                               user=USER,
-                               password=PASSWORD,
-                               database=DB,
-                               cursorclass=pymysql.cursors.DictCursor)
-  with connection:  # SI SE CONECTO EJECUTA EL CÓDIGO SIGUIENTE
-    with connection.cursor() as cursor:  # SI PUEDE GENERAR EL CURSOS EJECUTA LO SIGUIENTE
-      sql = request.form.get("sql")
-      cursor.execute(sql)
-      data = cursor.fetchall()
-      respuesta = "<TABLE class='table bg-white'>"
-      for fila in data:
-        respuesta = respuesta + "<TR>"
-        for celda in fila:
-          respuesta = respuesta + f"<TD colspan='2'>{fila[celda]}</TD>"
-        respuesta = respuesta + "</TR>"
-      respuesta = respuesta + "</TABLE>"
-  return respuesta
+  try:
+    HOST = session['host']
+    USER = session['user']
+    PASSWORD = session['password']
+    DB = session['db']
+    # CONECTARSE A LA BASE DE DATOS.
+    connection = pymysql.connect(host=HOST,
+                                 user=USER,
+                                 password=PASSWORD,
+                                 database=DB,
+                                 cursorclass=pymysql.cursors.DictCursor)
+
+    with connection:  # SI SE CONECTO EJECUTA EL CÓDIGO SIGUIENTE
+      with connection.cursor() as cursor:  # SI PUEDE GENERAR EL CURSOS EJECUTA LO SIGUIENTE
+        sql = request.form.get("sql")
+        sentencias_tipo = ['CREATE', 'UPDATE', 'INSERT', 'DELETE']
+        band = 0
+        for sentencia in sentencias_tipo:
+          if sentencia in sql or sentencia.upper() in sql:
+            band = 1
+        # EJECUTAMOS LA SENTENCIA SQL
+        afectadas = cursor.execute(sql)
+        if band == 0:
+          data = cursor.fetchall()
+          respuesta = "<TABLE class='table table-bordered table-striped'>"
+          band = 0
+          if len(data) > 0:
+            for fila in data:
+
+              if band == 0:
+                respuesta = respuesta + "<THEAD><TR>"
+                for celda in fila:
+                  respuesta = respuesta + f"<TH>{celda}</TH>"
+                respuesta = respuesta + "</TR></THEAD><TBODY>"
+              respuesta = respuesta + "<TR>"
+              for celda in fila:
+                respuesta = respuesta + f"<TD>{fila[celda]}</TD>"
+              respuesta = respuesta + "</TR>"
+              band = 1
+            respuesta = respuesta + "</TBODY></TABLE>"
+          else:
+            respuesta = "<div class='alert alert-warning text-center'>No se han retornado datos.</div>"
+        else:
+          connection.commit()
+          respuesta = f"<div class='alert alert-warning text-center'>Se han afecta {afectadas} filas.</div>"
+    connection.close()
+    return respuesta
+  except pymysql.Error as error:
+    code, message = error.args
+    error = f"Código: <b>{code}</b>: <i>{message}</i>"
+    respuesta = f"<div class='alert alert-danger text-center'><b> Error en la sentencia </b> >> {error}</div>"
+    return respuesta
 
 @application.route("/salir", methods=['GET'])
 def salir():
