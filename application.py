@@ -1,15 +1,16 @@
-# PAQUETES REQUERIDOS
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 import flask
 from flask import Flask, render_template, request, session
 import pymysql.cursors
 import re
 import logging
 import traceback
-logging.basicConfig(filename='usqele.log', filemode='w', level=logging.DEBUG)
+logging.basicConfig(filename='./usqele.log', filemode='w', level=logging.DEBUG)
 
 # GENERACIÓN DE LA APLICACIÓN FLASK
 application = Flask(__name__)
-application.secret_key = 'USQELE-KEY-12412'
+application.secret_key = 'USQELE-SESSION'
 # ENDPOINT DE LA APLICACIÓN
 @application.route("/")
 def home():
@@ -36,7 +37,7 @@ def conectar():
   PASSWORD = request.form.get("password")
   DB = request.form.get("bd")
   # GENERAMOS EL LOG DE ACCESO
-  logging.info(f'se ha conectado {USER}.' )  # will not print anything
+  logging.info(f'se ha conectado {USER}.')
   # CONECTARSE A LA BASE DE DATOS
   connection = pymysql.connect(host=HOST,
                                user=USER,
@@ -50,7 +51,7 @@ def conectar():
           session['user'] = USER
           session['password'] = PASSWORD
           session['db'] = DB
-
+  connection.close()
   return flask.redirect("/dashboard")
 
 @application.route("/dashboard", methods=['GET'])
@@ -91,6 +92,7 @@ def dashboard():
               if i == 0:
                 lvistas.append(f"{vista[columna]}")
               i += 1
+      connection.close()
       return render_template('dashboard.html', tablas=ltablas, vistas=lvistas, basededatos=DB)
   else:
     return flask.redirect("/login")
