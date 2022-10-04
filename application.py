@@ -6,19 +6,25 @@ import pymysql.cursors
 import re
 import logging
 import traceback
-logging.basicConfig(filename='./usqele.log', filemode='w', level=logging.DEBUG)
+import os
+# LOAD CONFIGURATION
+from config.startup import Startup
 
 # GENERACIÓN DE LA APLICACIÓN FLASK
 application = Flask(__name__)
 application.secret_key = 'USQELE-SESSION'
-# ENDPOINT DE LA APLICACIÓN
+
+AUTHOR = os.getenv('AUTHOR')
+AUTHOR_EMAIL = os.getenv('AUTHOR_EMAIL')
+
+# ENDPOINT ROOT
 @application.route("/")
 def home():
   '''
   Permite la conexión a la base de datos.
   :return:
   '''
-  return render_template('index.html')
+  return render_template('index.html', AUTHOR=AUTHOR, AUTHOR_EMAIL=AUTHOR_EMAIL)
 
 # ENDPOINT DE LA APLICACIÓN
 @application.route("/login")
@@ -27,7 +33,7 @@ def login():
   Permite la conexión a la base de datos.
   :return:
   '''
-  return render_template('login.html')
+  return render_template('login.html', AUTHOR=AUTHOR, AUTHOR_EMAIL=AUTHOR_EMAIL)
 
 
 @application.route("/conectar", methods=['POST'])
